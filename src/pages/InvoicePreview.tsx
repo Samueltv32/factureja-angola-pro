@@ -1,10 +1,13 @@
 
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useInvoice } from '@/contexts/InvoiceContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowLeft, Download, Edit, Printer } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { ArrowLeft, Download, Edit, Printer, Copy, Upload, CheckCircle, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 
 // Template Components
@@ -16,13 +19,52 @@ const InvoicePreview = () => {
   const navigate = useNavigate();
   const { invoiceData, resetInvoice } = useInvoice();
   const printRef = useRef<HTMLDivElement>(null);
+  const [paymentStatus, setPaymentStatus] = useState<'pending' | 'paid' | 'verifying'>('pending');
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'kwik' | 'express' | ''>('');
+  const [paymentProof, setPaymentProof] = useState<File | null>(null);
+  const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
 
   const handleDownloadPDF = () => {
+    if (paymentStatus !== 'paid') {
+      toast.error('Efetue o pagamento primeiro para baixar a fatura');
+      setIsPaymentDialogOpen(true);
+      return;
+    }
     if (window.print) {
       window.print();
     } else {
       toast.error('Funcionalidade de PDF não disponível neste navegador');
     }
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success('Copiado para a área de transferência');
+  };
+
+  const handlePaymentProofUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setPaymentProof(file);
+      toast.success('Comprovativo carregado com sucesso');
+    }
+  };
+
+  const submitPaymentProof = () => {
+    if (!paymentProof || !selectedPaymentMethod) {
+      toast.error('Selecione o método de pagamento e carregue o comprovativo');
+      return;
+    }
+    
+    setPaymentStatus('verifying');
+    setIsPaymentDialogOpen(false);
+    toast.success('Comprovativo enviado! Aguarde a verificação (até 24h)');
+    
+    // Simular verificação para demo
+    setTimeout(() => {
+      setPaymentStatus('paid');
+      toast.success('Pagamento confirmado! Pode agora baixar a fatura.');
+    }, 3000);
   };
 
   const handlePrint = () => {
@@ -127,26 +169,180 @@ const InvoicePreview = () => {
       </div>
 
       <div className="container mx-auto px-4 py-8 max-w-4xl">
-        {/* Payment Notice */}
-        <div className="bg-angola-yellow/10 border border-angola-yellow/20 rounded-lg p-4 mb-6 no-print">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="font-semibold text-angola-black mb-1">
-                Fatura Pronta para Download!
-              </h3>
-              <p className="text-sm text-gray-600">
-                Total: <span className="font-bold">{getTotalAmount().toLocaleString('pt-AO')} Kz</span> • 
-                Taxa de serviço: <span className="font-bold text-angola-red">500 Kz</span>
-              </p>
+        {/* Payment Status */}
+        {paymentStatus === 'pending' && (
+          <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6 no-print">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold text-orange-800 mb-1 flex items-center">
+                  <Clock className="h-4 w-4 mr-2" />
+                  Pagamento Pendente
+                </h3>
+                <p className="text-sm text-orange-600">
+                  Taxa de serviço: <span className="font-bold">500 Kz</span> • Efetue o pagamento para baixar a fatura
+                </p>
+              </div>
+              <Dialog open={isPaymentDialogOpen} onOpenChange={setIsPaymentDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="bg-angola-red hover:bg-red-700">
+                    Pagar Agora
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Efetuar Pagamento - 500 Kz</DialogTitle>
+                  </DialogHeader>
+                  
+                  <div className="space-y-6">
+                    <div className="space-y-4">
+                      <Label className="text-base font-medium">Escolha o método de pagamento:</Label>
+                      
+                      {/* Kwik Option */}
+                      <div 
+                        className={`border-2 rounded-lg p-4 cursor-pointer transition-colors ${
+                          selectedPaymentMethod === 'kwik' 
+                            ? 'border-angola-red bg-red-50' 
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                        onClick={() => setSelectedPaymentMethod('kwik')}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-semibold">Transferência Kwik</h4>
+                          <div className={`w-4 h-4 rounded-full border-2 ${
+                            selectedPaymentMethod === 'kwik' ? 'bg-angola-red border-angola-red' : 'border-gray-300'
+                          }`}></div>
+                        </div>
+                        {selectedPaymentMethod === 'kwik' && (
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between bg-gray-50 p-2 rounded">
+                              <span className="text-sm font-medium">IBAN:</span>
+                              <div className="flex items-center space-x-2">
+                                <span className="text-sm font-mono">0040.0000.4792.3716.1016.9</span>
+                                <Button 
+                                  size="sm" 
+                                  variant="ghost"
+                                  onClick={() => copyToClipboard('0040.0000.4792.3716.1016.9')}
+                                >
+                                  <Copy className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            </div>
+                            <p className="text-xs text-gray-600">
+                              Nome: FactureJá • Valor: 500 Kz
+                            </p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Express Option */}
+                      <div 
+                        className={`border-2 rounded-lg p-4 cursor-pointer transition-colors ${
+                          selectedPaymentMethod === 'express' 
+                            ? 'border-angola-red bg-red-50' 
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                        onClick={() => setSelectedPaymentMethod('express')}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-semibold">Transferência Express</h4>
+                          <div className={`w-4 h-4 rounded-full border-2 ${
+                            selectedPaymentMethod === 'express' ? 'bg-angola-red border-angola-red' : 'border-gray-300'
+                          }`}></div>
+                        </div>
+                        {selectedPaymentMethod === 'express' && (
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between bg-gray-50 p-2 rounded">
+                              <span className="text-sm font-medium">Telefone:</span>
+                              <div className="flex items-center space-x-2">
+                                <span className="text-sm font-mono">941890316</span>
+                                <Button 
+                                  size="sm" 
+                                  variant="ghost"
+                                  onClick={() => copyToClipboard('941890316')}
+                                >
+                                  <Copy className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            </div>
+                            <p className="text-xs text-gray-600">
+                              Nome: FactureJá • Valor: 500 Kz
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Upload Proof */}
+                    {selectedPaymentMethod && (
+                      <div className="space-y-3">
+                        <Label className="text-base font-medium">Enviar comprovativo de pagamento:</Label>
+                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                          <Input
+                            type="file"
+                            accept="image/*,.pdf"
+                            onChange={handlePaymentProofUpload}
+                            className="hidden"
+                            id="payment-proof"
+                          />
+                          <Label 
+                            htmlFor="payment-proof" 
+                            className="cursor-pointer flex flex-col items-center space-y-2"
+                          >
+                            <Upload className="h-8 w-8 text-gray-400" />
+                            <span className="text-sm text-gray-600">
+                              {paymentProof ? paymentProof.name : 'Clique para selecionar arquivo'}
+                            </span>
+                            <span className="text-xs text-gray-400">PNG, JPG ou PDF até 5MB</span>
+                          </Label>
+                        </div>
+                      </div>
+                    )}
+
+                    <Button 
+                      onClick={submitPaymentProof}
+                      disabled={!selectedPaymentMethod || !paymentProof}
+                      className="w-full bg-angola-red hover:bg-red-700"
+                    >
+                      Enviar Comprovativo
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
-            <Button 
-              className="bg-angola-red hover:bg-red-700"
-              onClick={() => toast.info('Integração de pagamento será adicionada em breve!')}
-            >
-              Pagar & Baixar
-            </Button>
           </div>
-        </div>
+        )}
+
+        {paymentStatus === 'verifying' && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 no-print">
+            <div className="flex items-center">
+              <Clock className="h-5 w-5 text-blue-600 mr-3" />
+              <div>
+                <h3 className="font-semibold text-blue-800 mb-1">
+                  Verificando Pagamento...
+                </h3>
+                <p className="text-sm text-blue-600">
+                  Comprovativo enviado! Verificação em andamento (até 24h)
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {paymentStatus === 'paid' && (
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6 no-print">
+            <div className="flex items-center">
+              <CheckCircle className="h-5 w-5 text-green-600 mr-3" />
+              <div>
+                <h3 className="font-semibold text-green-800 mb-1">
+                  Pagamento Confirmado!
+                </h3>
+                <p className="text-sm text-green-600">
+                  Pode agora baixar a sua fatura em PDF
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Invoice Preview */}
         <Card className="shadow-lg">
