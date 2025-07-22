@@ -22,6 +22,7 @@ export default {
 			fontFamily: {
 				'inter': ['Inter', 'sans-serif'],
 				'poppins': ['Poppins', 'sans-serif'],
+				'montserrat': ['Montserrat', 'sans-serif'],
 			},
 			colors: {
 				border: 'hsl(var(--border))',
@@ -71,6 +72,15 @@ export default {
 					red: '#dc2626',
 					black: '#1f2937',
 					yellow: '#fbbf24'
+				},
+				sophisticated: {
+					navy: '#1e3a8a',
+					'navy-dark': '#1e40af',
+					'gray-dark': '#374151',
+					'gray-medium': '#6b7280',
+					'gray-light': '#f3f4f6',
+					beige: '#fef7ed',
+					'beige-light': '#fffbf5'
 				}
 			},
 			borderRadius: {

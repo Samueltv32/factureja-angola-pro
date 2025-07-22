@@ -183,7 +183,7 @@ const InvoicePreview = () => {
       </div>
 
       {/* Print Styles */}
-      <style jsx>{`
+      <style>{`
         @media print {
           .no-print { display: none !important; }
           body { margin: 0; }
