@@ -1,5 +1,5 @@
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useInvoice } from '@/contexts/InvoiceContext';
 import { Button } from '@/components/ui/button';
@@ -7,8 +7,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Download, Edit, Printer, Copy, Upload, CheckCircle, Clock } from 'lucide-react';
+import { ArrowLeft, Download, Edit, Printer, Copy, Upload, CheckCircle, Clock, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 // Template Components
 import ClassicTemplate from '@/components/templates/ClassicTemplate';
@@ -19,10 +20,136 @@ const InvoicePreview = () => {
   const navigate = useNavigate();
   const { invoiceData, resetInvoice } = useInvoice();
   const printRef = useRef<HTMLDivElement>(null);
-  const [paymentStatus, setPaymentStatus] = useState<'pending' | 'paid' | 'verifying'>('pending');
+  const [paymentStatus, setPaymentStatus] = useState<'pending' | 'paid' | 'verifying' | 'rejected'>('pending');
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'kwik' | 'express' | ''>('');
   const [paymentProof, setPaymentProof] = useState<File | null>(null);
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
+  const [comprovativoId, setComprovativoId] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Verificar status do pagamento ao carregar
+  useEffect(() => {
+    const storedComprovativoId = localStorage.getItem(`comprovativo_${invoiceData.invoiceNumber}`);
+    if (storedComprovativoId) {
+      setComprovativoId(storedComprovativoId);
+      verificarStatusPagamento(storedComprovativoId);
+    }
+  }, []);
+
+  // Real-time updates para status do pagamento
+  useEffect(() => {
+    if (!comprovativoId) return;
+
+    const channel = supabase
+      .channel('comprovativo-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'comprovativos_pagamento',
+          filter: `id=eq.${comprovativoId}`
+        },
+        (payload) => {
+          console.log('Status atualizado:', payload);
+          const novoStatus = payload.new.status;
+          if (novoStatus === 'aprovado') {
+            setPaymentStatus('paid');
+            toast.success('Pagamento aprovado! Pode agora baixar a fatura.');
+          } else if (novoStatus === 'rejeitado') {
+            setPaymentStatus('rejected');
+            toast.error('Pagamento rejeitado. Verifique o comprovativo e tente novamente.');
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [comprovativoId]);
+
+  const verificarStatusPagamento = async (id: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('comprovativos_pagamento')
+        .select('status')
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        switch (data.status) {
+          case 'aprovado':
+            setPaymentStatus('paid');
+            break;
+          case 'rejeitado':
+            setPaymentStatus('rejected');
+            break;
+          case 'pendente':
+            setPaymentStatus('verifying');
+            break;
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao verificar status:', error);
+    }
+  };
+
+  const uploadComprovativo = async (file: File): Promise<string> => {
+    const fileName = `comprovativo_${invoiceData.invoiceNumber}_${Date.now()}.${file.name.split('.').pop()}`;
+    
+    // Simular upload - em produção seria para o Supabase Storage
+    const mockUrl = `https://storage.supabase.com/comprovativos/${fileName}`;
+    
+    // Simular delay do upload
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    return mockUrl;
+  };
+
+  const submitPaymentProof = async () => {
+    if (!paymentProof || !selectedPaymentMethod) {
+      toast.error('Selecione o método de pagamento e carregue o comprovativo');
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      // Upload do comprovativo
+      const comprovantivoUrl = await uploadComprovativo(paymentProof);
+      
+      // Salvar no Supabase
+      const { data, error } = await supabase
+        .from('comprovativos_pagamento')
+        .insert({
+          nome_cliente: invoiceData.clientName,
+          fatura_id: invoiceData.invoiceNumber,
+          comprovativo_url: comprovantivoUrl,
+          status: 'pendente'
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Salvar ID localmente para verificações futuras
+      localStorage.setItem(`comprovativo_${invoiceData.invoiceNumber}`, data.id);
+      setComprovativoId(data.id);
+      
+      setPaymentStatus('verifying');
+      setIsPaymentDialogOpen(false);
+      toast.success('Comprovativo enviado! Aguarde a verificação do administrador.');
+      
+    } catch (error) {
+      console.error('Erro ao enviar comprovativo:', error);
+      toast.error('Erro ao enviar comprovativo. Tente novamente.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const handleDownloadPDF = () => {
     if (paymentStatus !== 'paid') {
@@ -48,23 +175,6 @@ const InvoicePreview = () => {
       setPaymentProof(file);
       toast.success('Comprovativo carregado com sucesso');
     }
-  };
-
-  const submitPaymentProof = () => {
-    if (!paymentProof || !selectedPaymentMethod) {
-      toast.error('Selecione o método de pagamento e carregue o comprovativo');
-      return;
-    }
-    
-    setPaymentStatus('verifying');
-    setIsPaymentDialogOpen(false);
-    toast.success('Comprovativo enviado! Aguarde a verificação (até 24h)');
-    
-    // Simular verificação para demo
-    setTimeout(() => {
-      setPaymentStatus('paid');
-      toast.success('Pagamento confirmado! Pode agora baixar a fatura.');
-    }, 3000);
   };
 
   const handlePrint = () => {
@@ -308,6 +418,35 @@ const InvoicePreview = () => {
                   </div>
                 </DialogContent>
               </Dialog>
+            </div>
+          </div>
+        )}
+
+        {paymentStatus === 'rejected' && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 no-print">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <X className="h-5 w-5 text-red-600 mr-3" />
+                <div>
+                  <h3 className="font-semibold text-red-800 mb-1">
+                    Pagamento Rejeitado
+                  </h3>
+                  <p className="text-sm text-red-600">
+                    Comprovativo rejeitado. Verifique os dados e envie novamente.
+                  </p>
+                </div>
+              </div>
+              <Button 
+                onClick={() => {
+                  setPaymentStatus('pending');
+                  setPaymentProof(null);
+                  setSelectedPaymentMethod('');
+                  setIsPaymentDialogOpen(true);
+                }}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                Tentar Novamente
+              </Button>
             </div>
           </div>
         )}
