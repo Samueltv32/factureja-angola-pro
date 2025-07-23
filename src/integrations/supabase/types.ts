@@ -14,7 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      comprovativos_pagamento: {
+        Row: {
+          comprovativo_url: string
+          created_at: string
+          data_envio: string
+          fatura_id: string
+          id: string
+          link_fatura: string | null
+          nome_cliente: string
+          observacao: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          comprovativo_url: string
+          created_at?: string
+          data_envio?: string
+          fatura_id: string
+          id?: string
+          link_fatura?: string | null
+          nome_cliente: string
+          observacao?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          comprovativo_url?: string
+          created_at?: string
+          data_envio?: string
+          fatura_id?: string
+          id?: string
+          link_fatura?: string | null
+          nome_cliente?: string
+          observacao?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
