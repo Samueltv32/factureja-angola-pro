@@ -257,23 +257,49 @@ const Admin = () => {
                           Ver Comprovativo
                         </Button>
                       </DialogTrigger>
-                      <DialogContent className="max-w-2xl">
+                      <DialogContent className="max-w-2xl" aria-describedby="comprovativo-dialog-description">
                         <DialogHeader>
                           <DialogTitle>Comprovativo - {comp.nome_cliente}</DialogTitle>
+                          <p id="comprovativo-dialog-description" className="text-sm text-muted-foreground">
+                            Visualização do comprovativo de pagamento para a fatura {comp.fatura_id}
+                          </p>
                         </DialogHeader>
                         <div className="mt-4">
                           {comp.comprovativo_url.toLowerCase().includes('.pdf') ? (
-                            <iframe
-                              src={comp.comprovativo_url}
-                              className="w-full h-96 border rounded"
-                              title="Comprovativo PDF"
-                            />
+                            <div className="space-y-2">
+                              <p className="text-sm text-muted-foreground">PDF Comprovativo:</p>
+                              <iframe
+                                src={comp.comprovativo_url}
+                                className="w-full h-96 border rounded"
+                                title="Comprovativo PDF"
+                                onError={() => {
+                                  console.error("Erro ao carregar PDF:", comp.comprovativo_url);
+                                }}
+                              />
+                              <p className="text-xs text-muted-foreground">
+                                Se o PDF não carregar, <a 
+                                  href={comp.comprovativo_url} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-primary hover:underline"
+                                >
+                                  clique aqui para abrir numa nova aba
+                                </a>
+                              </p>
+                            </div>
                           ) : (
-                            <img
-                              src={comp.comprovativo_url}
-                              alt="Comprovativo"
-                              className="w-full max-h-96 object-contain border rounded"
-                            />
+                            <div className="space-y-2">
+                              <p className="text-sm text-muted-foreground">Imagem Comprovativo:</p>
+                              <img
+                                src={comp.comprovativo_url}
+                                alt="Comprovativo"
+                                className="w-full max-h-96 object-contain border rounded"
+                                onError={(e) => {
+                                  console.error("Erro ao carregar imagem:", comp.comprovativo_url);
+                                  (e.target as HTMLImageElement).src = "/placeholder.svg";
+                                }}
+                              />
+                            </div>
                           )}
                         </div>
                       </DialogContent>
