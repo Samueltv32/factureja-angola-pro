@@ -9,6 +9,7 @@ import Welcome from "./pages/Welcome";
 import InvoiceForm from "./pages/InvoiceForm";
 import TemplateSelection from "./pages/TemplateSelection";
 import InvoicePreview from "./pages/InvoicePreview";
+import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
             <Route path="/criar-fatura" element={<InvoiceForm />} />
             <Route path="/escolher-modelo" element={<TemplateSelection />} />
             <Route path="/visualizar" element={<InvoicePreview />} />
+            <Route path="/admin" element={<Admin />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
