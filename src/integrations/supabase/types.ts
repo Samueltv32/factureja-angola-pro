@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       comprovativos_pagamento: {
         Row: {
+          codigo_fatura: string
           comprovativo_url: string
           created_at: string
           data_envio: string
@@ -28,6 +29,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          codigo_fatura?: string
           comprovativo_url: string
           created_at?: string
           data_envio?: string
@@ -40,6 +42,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          codigo_fatura?: string
           comprovativo_url?: string
           created_at?: string
           data_envio?: string

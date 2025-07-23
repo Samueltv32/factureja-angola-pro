@@ -26,6 +26,14 @@ const InvoicePreview = () => {
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
   const [comprovativoId, setComprovativoId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [codigoFatura, setCodigoFatura] = useState<string>('');
+
+  // Inicializar código da fatura
+  useEffect(() => {
+    if (invoiceData.invoiceNumber) {
+      setCodigoFatura(invoiceData.invoiceNumber);
+    }
+  }, [invoiceData.invoiceNumber]);
 
   // Verificar status do pagamento ao carregar
   useEffect(() => {
@@ -127,6 +135,7 @@ const InvoicePreview = () => {
         .insert({
           nome_cliente: invoiceData.clientName,
           fatura_id: invoiceData.invoiceNumber,
+          codigo_fatura: codigoFatura,
           comprovativo_url: comprovantivoUrl,
           status: 'pendente'
         })
