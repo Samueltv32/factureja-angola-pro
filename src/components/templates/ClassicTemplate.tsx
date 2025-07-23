@@ -56,6 +56,12 @@ const ClassicTemplate: React.FC<ClassicTemplateProps> = ({
               {data.hasMultiplePages && <p className="text-gray-500">
                   <span className="font-semibold">Página:</span> {data.currentPage} de {data.totalPages}
                 </p>}
+              {/* Cliente compacto para páginas múltiplas */}
+              {data.hasMultiplePages && data.currentPage > 1 && data.clientName && (
+                <p className="text-gray-600 font-semibold border-t border-gray-300 pt-1 mt-1">
+                  Cliente: {data.clientName}
+                </p>
+              )}
             </div>
           </div>
         </div>

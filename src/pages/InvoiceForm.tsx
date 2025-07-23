@@ -44,10 +44,32 @@ const InvoiceForm = () => {
   };
 
   const handleContinue = () => {
-    if (!invoiceData.companyName || !invoiceData.clientName || invoiceData.items.length === 0) {
-      toast.error('Preencha os campos obrigatórios e adicione pelo menos um item');
+    // Validação mais rigorosa
+    const requiredFields = [];
+    
+    if (!invoiceData.companyName?.trim()) requiredFields.push('Nome da Empresa');
+    if (!invoiceData.companyAddress?.trim()) requiredFields.push('Endereço da Empresa');
+    if (!invoiceData.companyPhone?.trim()) requiredFields.push('Telefone da Empresa');
+    if (!invoiceData.clientName?.trim()) requiredFields.push('Nome do Cliente');
+    if (!invoiceData.clientAddress?.trim()) requiredFields.push('Endereço do Cliente');
+    if (invoiceData.items.length === 0) requiredFields.push('Pelo menos um item');
+    
+    // Verificar se todos os itens têm descrição
+    const emptyItems = invoiceData.items.filter(item => !item.description?.trim());
+    if (emptyItems.length > 0) requiredFields.push('Descrição de todos os itens');
+    
+    if (requiredFields.length > 0) {
+      toast.error(`Campos obrigatórios faltando: ${requiredFields.join(', ')}`);
       return;
     }
+    
+    // Log para debug
+    console.log('Dados da fatura ao continuar:', {
+      companyName: invoiceData.companyName,
+      clientName: invoiceData.clientName,
+      itemsCount: invoiceData.items.length,
+      firstItem: invoiceData.items[0]
+    });
     
     // Generate invoice number if not set
     if (!invoiceData.invoiceNumber) {

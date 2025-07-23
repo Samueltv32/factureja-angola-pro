@@ -64,6 +64,14 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({ data, className = '' })
                   Página {data.currentPage} de {data.totalPages}
                 </p>
               )}
+              {/* Cliente compacto para páginas múltiplas */}
+              {data.hasMultiplePages && data.currentPage > 1 && data.clientName && (
+                <div className="border-t border-white/20 pt-1 mt-1">
+                  <p className="text-white/90 font-medium">
+                    Cliente: {data.clientName}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -66,6 +66,14 @@ const MinimalTemplate: React.FC<MinimalTemplateProps> = ({ data, className = '' 
                   Página {data.currentPage} de {data.totalPages}
                 </p>
               )}
+              {/* Cliente compacto para páginas múltiplas */}
+              {data.hasMultiplePages && data.currentPage > 1 && data.clientName && (
+                <div className="border-t border-gray-300 pt-1 mt-1">
+                  <p className="text-gray-700 font-medium">
+                    Cliente: {data.clientName}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>

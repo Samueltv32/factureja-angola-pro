@@ -33,6 +33,23 @@ const InvoicePreview = () => {
     if (invoiceData.invoiceNumber) {
       setCodigoFatura(invoiceData.invoiceNumber);
       
+      // Log para debug - verificar dados do cliente
+      console.log('InvoicePreview - Dados da fatura:', {
+        invoiceNumber: invoiceData.invoiceNumber,
+        companyName: invoiceData.companyName,
+        clientName: invoiceData.clientName,
+        clientAddress: invoiceData.clientAddress,
+        hasClientName: Boolean(invoiceData.clientName),
+        clientNameLength: invoiceData.clientName?.length || 0,
+        allData: invoiceData
+      });
+      
+      // Verificar se o nome do cliente está faltando
+      if (!invoiceData.clientName || !invoiceData.clientName.trim()) {
+        console.error('⚠️ ATENÇÃO: Nome do cliente está vazio ou faltando!');
+        toast.error('Dados do cliente faltando. Verifique se preencheu o nome do cliente.');
+      }
+      
       // Salvar dados da fatura no localStorage com expiração de 30 dias
       const faturaData = {
         ...invoiceData,
