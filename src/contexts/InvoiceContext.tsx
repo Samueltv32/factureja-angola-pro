@@ -40,6 +40,11 @@ export interface InvoiceData {
   
   // Template
   selectedTemplate: 'classic' | 'modern' | 'minimal';
+  
+  // Pagination (optional - added by pagination system)
+  currentPage?: number;
+  totalPages?: number;
+  hasMultiplePages?: boolean;
 }
 
 interface InvoiceContextType {
@@ -50,6 +55,8 @@ interface InvoiceContextType {
   updateItem: (id: string, item: Partial<InvoiceItem>) => void;
   getTotalAmount: () => number;
   resetInvoice: () => void;
+  getItemsPerPage: () => number;
+  getEstimatedPages: () => number;
 }
 
 const InvoiceContext = createContext<InvoiceContextType | undefined>(undefined);
@@ -125,6 +132,24 @@ export const InvoiceProvider = ({ children }: { children: ReactNode }) => {
     setInvoiceData(initialInvoiceData);
   };
 
+  const getItemsPerPage = () => {
+    switch (invoiceData.selectedTemplate) {
+      case 'classic':
+        return 15;
+      case 'modern':
+        return 12;
+      case 'minimal':
+        return 18;
+      default:
+        return 15;
+    }
+  };
+
+  const getEstimatedPages = () => {
+    const itemsPerPage = getItemsPerPage();
+    return Math.ceil(invoiceData.items.length / itemsPerPage) || 1;
+  };
+
   return (
     <InvoiceContext.Provider value={{
       invoiceData,
@@ -133,7 +158,9 @@ export const InvoiceProvider = ({ children }: { children: ReactNode }) => {
       removeItem,
       updateItem,
       getTotalAmount,
-      resetInvoice
+      resetInvoice,
+      getItemsPerPage,
+      getEstimatedPages
     }}>
       {children}
     </InvoiceContext.Provider>

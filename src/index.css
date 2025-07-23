@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -101,5 +102,85 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* A4 Print Styles */
+@media print {
+  @page {
+    size: A4;
+    margin: 15mm 10mm;
+  }
+
+  body {
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  .print-page-break {
+    page-break-before: always;
+  }
+
+  .print-avoid-break {
+    page-break-inside: avoid;
+  }
+
+  .print-hide {
+    display: none !important;
+  }
+
+  .print-show {
+    display: block !important;
+  }
+
+  /* Ensure A4 dimensions for screen preview */
+  .a4-page {
+    width: 210mm;
+    min-height: 297mm;
+    max-height: 297mm;
+    overflow: hidden;
+  }
+
+  .a4-content {
+    height: 100%;
+    padding: 15mm 10mm;
+  }
+}
+
+/* A4 Screen Preview */
+.a4-page {
+  width: 210mm;
+  min-height: 297mm;
+  background: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  margin: 0 auto 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.a4-content {
+  height: 100%;
+  padding: 15mm 10mm;
+  display: flex;
+  flex-direction: column;
+}
+
+.pagination-controls {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 10px;
+}
+
+@media screen and (max-width: 768px) {
+  .a4-page {
+    width: 100%;
+    min-height: auto;
+    margin: 0;
+    box-shadow: none;
   }
 }
