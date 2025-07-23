@@ -65,6 +65,14 @@ const Welcome = () => {
         return;
       }
       
+      // Converter strings de data de volta para objetos Date
+      if (dadosFatura.invoiceDate) {
+        dadosFatura.invoiceDate = new Date(dadosFatura.invoiceDate);
+      }
+      if (dadosFatura.dueDate) {
+        dadosFatura.dueDate = new Date(dadosFatura.dueDate);
+      }
+      
       // Carregar dados da fatura no contexto
       updateInvoiceData(dadosFatura);
       toast.success('Fatura encontrada! Redirecionando...');
