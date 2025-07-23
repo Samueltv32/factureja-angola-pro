@@ -24,7 +24,7 @@ const TemplateSelection = () => {
       ],
       icon: <Palette className="h-6 w-6" />,
       color: 'from-slate-500 to-slate-700',
-      preview: '/api/placeholder/300/400'
+      preview: 'https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=300&h=400&fit=crop'
     },
     {
       id: 'modern' as const,
@@ -39,7 +39,7 @@ const TemplateSelection = () => {
       ],
       icon: <Sparkles className="h-6 w-6" />,
       color: 'from-blue-900 to-slate-800',
-      preview: '/api/placeholder/300/400'
+      preview: 'https://images.unsplash.com/photo-1483058712412-4245e9b90334?w=300&h=400&fit=crop'
     },
     {
       id: 'minimal' as const,
@@ -54,7 +54,7 @@ const TemplateSelection = () => {
       ],
       icon: <Minimize2 className="h-6 w-6" />,
       color: 'from-gray-400 to-gray-600',
-      preview: '/api/placeholder/300/400'
+      preview: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=300&h=400&fit=crop'
     }
   ];
 
@@ -128,11 +128,12 @@ const TemplateSelection = () => {
               </div>
 
               {/* Template Preview */}
-              <div className="bg-gray-100 h-48 flex items-center justify-center">
-                <div className="text-gray-400 text-center">
-                  <div className="w-16 h-20 border-2 border-dashed border-gray-300 mx-auto mb-2"></div>
-                  <p className="text-sm">Preview do Modelo</p>
-                </div>
+              <div className="bg-gray-100 h-48 overflow-hidden">
+                <img 
+                  src={template.preview} 
+                  alt={`Preview do modelo ${template.name}`}
+                  className="w-full h-full object-cover"
+                />
               </div>
 
               {/* Template Features */}
