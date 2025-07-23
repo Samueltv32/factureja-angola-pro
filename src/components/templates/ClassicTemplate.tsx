@@ -67,13 +67,14 @@ const ClassicTemplate: React.FC<ClassicTemplateProps> = ({
         </div>
       </div>
 
-      {/* Client Information - Only on first page */}
-      {data.currentPage === 1 && <div className="mb-6">
-          <h3 className="text-sm font-semibold text-slate-700 mb-2 border-b border-gray-300 pb-1">
-            FATURAR A:
-          </h3>
-          <div className="bg-gray-50 p-3 rounded border">
-            <h4 className="font-semibold text-base text-gray-900 mb-1">{data.clientName}</h4>
+      {/* Client Information - Always show */}
+      <div className="mb-6">
+        <h3 className="text-sm font-semibold text-slate-700 mb-2 border-b border-gray-300 pb-1">
+          FATURAR A:
+        </h3>
+        <div className="bg-gray-50 p-3 rounded border">
+          <h4 className="font-semibold text-base text-gray-900 mb-1">{data.clientName}</h4>
+          {data.currentPage === 1 ? (
             <div className="text-xs text-gray-700 space-y-1">
               <p>{data.clientAddress}</p>
               <div className="flex flex-wrap gap-3">
@@ -82,8 +83,13 @@ const ClassicTemplate: React.FC<ClassicTemplateProps> = ({
                 {data.clientTaxId && <span>NIF: {data.clientTaxId}</span>}
               </div>
             </div>
-          </div>
-        </div>}
+          ) : (
+            <div className="text-xs text-gray-700">
+              {data.clientAddress}
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Items Table */}
       <div className="flex-1 mb-4">

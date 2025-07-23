@@ -77,44 +77,52 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({ data, className = '' })
         </div>
       </div>
 
-      {/* Company and Client Details - Only on first page */}
-      {data.currentPage === 1 && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-          {/* Company Details */}
-          <div className="bg-sophisticated-beige-light border-l-4 border-sophisticated-navy rounded-r-lg p-3">
-            <h3 className="text-sm font-semibold text-sophisticated-navy mb-2 flex items-center">
-              <Building2 className="h-4 w-4 mr-1" />
-              Dados da Empresa
-            </h3>
-            <div className="space-y-2 text-xs">
-              <div className="flex items-center space-x-2">
-                <Phone className="h-3 w-3 text-sophisticated-navy flex-shrink-0" />
-                <span className="text-sophisticated-gray-dark">{data.companyPhone}</span>
-              </div>
-              {data.companyEmail && (
+      {/* Company and Client Details - Always show */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+        {/* Company Details - Show all on first page, minimal on others */}
+        <div className="bg-sophisticated-beige-light border-l-4 border-sophisticated-navy rounded-r-lg p-3">
+          <h3 className="text-sm font-semibold text-sophisticated-navy mb-2 flex items-center">
+            <Building2 className="h-4 w-4 mr-1" />
+            Dados da Empresa
+          </h3>
+          <div className="space-y-2 text-xs">
+            {data.currentPage === 1 ? (
+              <>
                 <div className="flex items-center space-x-2">
-                  <Mail className="h-3 w-3 text-sophisticated-navy flex-shrink-0" />
-                  <span className="text-sophisticated-gray-dark break-all">{data.companyEmail}</span>
+                  <Phone className="h-3 w-3 text-sophisticated-navy flex-shrink-0" />
+                  <span className="text-sophisticated-gray-dark">{data.companyPhone}</span>
                 </div>
-              )}
-              {data.companyTaxId && (
-                <div className="text-sophisticated-gray-medium">
-                  <span className="font-medium text-sophisticated-navy">NIF:</span> {data.companyTaxId}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Client Details */}
-          <div className="bg-sophisticated-gray-light border-l-4 border-sophisticated-gray-dark rounded-r-lg p-3">
-            <h3 className="text-sm font-semibold text-sophisticated-gray-dark mb-2 flex items-center">
-              <div className="w-4 h-4 bg-sophisticated-gray-dark rounded-full mr-1 flex items-center justify-center">
-                <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+                {data.companyEmail && (
+                  <div className="flex items-center space-x-2">
+                    <Mail className="h-3 w-3 text-sophisticated-navy flex-shrink-0" />
+                    <span className="text-sophisticated-gray-dark break-all">{data.companyEmail}</span>
+                  </div>
+                )}
+                {data.companyTaxId && (
+                  <div className="text-sophisticated-gray-medium">
+                    <span className="font-medium text-sophisticated-navy">NIF:</span> {data.companyTaxId}
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="text-xs text-sophisticated-gray-medium">
+                Tel: {data.companyPhone}
               </div>
-              Faturado Para
-            </h3>
-            <div>
-              <h4 className="font-bold text-sm text-sophisticated-gray-dark mb-2">{data.clientName}</h4>
+            )}
+          </div>
+        </div>
+
+        {/* Client Details - Always show */}
+        <div className="bg-sophisticated-gray-light border-l-4 border-sophisticated-gray-dark rounded-r-lg p-3">
+          <h3 className="text-sm font-semibold text-sophisticated-gray-dark mb-2 flex items-center">
+            <div className="w-4 h-4 bg-sophisticated-gray-dark rounded-full mr-1 flex items-center justify-center">
+              <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+            </div>
+            Faturado Para
+          </h3>
+          <div>
+            <h4 className="font-bold text-sm text-sophisticated-gray-dark mb-2">{data.clientName}</h4>
+            {data.currentPage === 1 ? (
               <div className="space-y-1 text-xs text-sophisticated-gray-medium">
                 <div className="flex items-start space-x-2">
                   <MapPin className="h-3 w-3 text-sophisticated-gray-dark mt-0.5 flex-shrink-0" />
@@ -138,10 +146,14 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({ data, className = '' })
                   </div>
                 )}
               </div>
-            </div>
+            ) : (
+              <div className="text-xs text-sophisticated-gray-medium">
+                {data.clientAddress}
+              </div>
+            )}
           </div>
         </div>
-      )}
+      </div>
 
       {/* Items Table */}
       <div className="flex-1 mb-4">
