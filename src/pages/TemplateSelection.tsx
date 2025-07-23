@@ -29,16 +29,16 @@ const TemplateSelection = () => {
     {
       id: 'modern' as const,
       name: 'Moderno & Elegante',
-      description: 'Visual ousado com layout em duas colunas e cores suaves',
+      description: 'Design sofisticado com gradiente azul-marinho e layout em duas colunas',
       features: [
-        'Layout em duas colunas',
-        'Cores elegantes (verde-água, lilás)',
-        'Ícones para contato',
-        'Espaço para código QR',
-        'Ideal para freelancers e criativos'
+        'Cabeçalho com gradiente azul-marinho',
+        'Layout em duas colunas responsivo',
+        'Cores elegantes (azul-marinho, bege)',
+        'Ícones para informações de contato',
+        'Ideal para empresas profissionais'
       ],
       icon: <Sparkles className="h-6 w-6" />,
-      color: 'from-teal-500 to-purple-500',
+      color: 'from-blue-900 to-slate-800',
       preview: '/api/placeholder/300/400'
     },
     {
