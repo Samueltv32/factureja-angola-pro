@@ -20,13 +20,13 @@ const PaginatedTemplateWrapper: React.FC<PaginatedTemplateWrapperProps> = ({
   const getItemsPerPage = (template: string) => {
     switch (template) {
       case 'classic':
-        return 12; // Classic template with full A4 layout
+        return 15; // Classic template can fit more items
       case 'modern':
-        return 10; // Modern template with more spacing  
+        return 12; // Modern template with spacing  
       case 'minimal':
-        return 15; // Minimal template is most compact
+        return 20; // Minimal template is most compact
       default:
-        return 12;
+        return 15;
     }
   };
 

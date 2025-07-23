@@ -113,15 +113,6 @@ const ClassicTemplate: React.FC<ClassicTemplateProps> = ({
                   {item.total.toLocaleString('pt-AO')} Kz
                 </td>
               </tr>)}
-            {/* Fill empty space if few items */}
-            {data.items.length < 10 && Array.from({ length: 10 - data.items.length }, (_, i) => (
-              <tr key={`empty-${i}`} className="bg-white">
-                <td className="border border-gray-300 p-2 text-xs">&nbsp;</td>
-                <td className="border border-gray-300 p-2">&nbsp;</td>
-                <td className="border border-gray-300 p-2">&nbsp;</td>
-                <td className="border border-gray-300 p-2">&nbsp;</td>
-              </tr>
-            ))}
           </tbody>
         </table>
 

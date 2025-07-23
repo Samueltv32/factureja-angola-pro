@@ -180,15 +180,6 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({ data, className = '' })
                   </td>
                 </tr>
               ))}
-              {/* Fill empty space if few items */}
-              {data.items.length < 8 && Array.from({ length: 8 - data.items.length }, (_, i) => (
-                <tr key={`empty-${i}`} className="bg-white">
-                  <td className="p-2 border-b border-sophisticated-gray-light text-xs">&nbsp;</td>
-                  <td className="p-2 border-b border-sophisticated-gray-light">&nbsp;</td>
-                  <td className="p-2 border-b border-sophisticated-gray-light">&nbsp;</td>
-                  <td className="p-2 border-b border-sophisticated-gray-light">&nbsp;</td>
-                </tr>
-              ))}
             </tbody>
           </table>
         </div>

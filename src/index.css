@@ -159,10 +159,10 @@ All colors MUST be HSL.
 }
 
 .a4-content {
-  min-height: 267mm; /* Full A4 height minus padding (297mm - 30mm) */
   padding: 15mm 10mm;
   display: flex;
   flex-direction: column;
+  min-height: calc(100% - 30mm);
 }
 
 .items-area {

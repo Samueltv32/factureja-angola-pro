@@ -121,14 +121,6 @@ const MinimalTemplate: React.FC<MinimalTemplateProps> = ({ data, className = '' 
               </div>
             </div>
           ))}
-          {/* Fill empty space if few items */}
-          {data.items.length < 15 && Array.from({ length: 15 - data.items.length }, (_, i) => (
-            <div key={`empty-${i}`} className="py-3 border-b border-gray-100">
-              <div className="text-sm font-light text-transparent">
-                &nbsp;
-              </div>
-            </div>
-          ))}
         </div>
 
         {/* Total - Only on last page */}
