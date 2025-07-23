@@ -36,11 +36,19 @@ const Welcome = () => {
       return;
     }
     
+    // Debug: Listar todas as faturas no localStorage
+    console.log('Todas as chaves no localStorage:', Object.keys(localStorage));
+    const faturasKeys = Object.keys(localStorage).filter(key => key.startsWith('fatura_'));
+    console.log('Faturas encontradas:', faturasKeys);
+    
     // Limpar faturas expiradas
     limparFaturasExpiradas();
     
     // Buscar fatura no localStorage
-    const faturaData = localStorage.getItem(`fatura_${codigoConsulta.trim()}`);
+    const chaveConsulta = `fatura_${codigoConsulta.trim()}`;
+    console.log('Procurando por chave:', chaveConsulta);
+    const faturaData = localStorage.getItem(chaveConsulta);
+    console.log('Dados encontrados:', faturaData ? 'Sim' : 'Não');
     
     if (!faturaData) {
       toast.error('Fatura não encontrada. Verifique o código ou a fatura pode ter expirado (30 dias).');
