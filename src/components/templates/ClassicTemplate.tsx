@@ -92,7 +92,7 @@ const ClassicTemplate: React.FC<ClassicTemplateProps> = ({
       </div>
 
       {/* Items Table */}
-      <div className="flex-1 mb-4">
+      <div className="items-area mb-4">
         <table className="w-full border-collapse border border-gray-300">
           <thead>
             <tr className="bg-slate-700 text-white">
@@ -113,6 +113,15 @@ const ClassicTemplate: React.FC<ClassicTemplateProps> = ({
                   {item.total.toLocaleString('pt-AO')} Kz
                 </td>
               </tr>)}
+            {/* Fill empty space if few items */}
+            {data.items.length < 10 && Array.from({ length: 10 - data.items.length }, (_, i) => (
+              <tr key={`empty-${i}`} className="bg-white">
+                <td className="border border-gray-300 p-2 text-xs">&nbsp;</td>
+                <td className="border border-gray-300 p-2">&nbsp;</td>
+                <td className="border border-gray-300 p-2">&nbsp;</td>
+                <td className="border border-gray-300 p-2">&nbsp;</td>
+              </tr>
+            ))}
           </tbody>
         </table>
 
@@ -150,10 +159,13 @@ const ClassicTemplate: React.FC<ClassicTemplateProps> = ({
         </div>}
 
       {/* Footer */}
-      <div className="border-t border-gray-300 pt-2 mt-auto">
+      <div className="invoice-footer border-t border-gray-300 pt-2">
         <div className="text-center text-xs text-gray-500">
           <p>Esta fatura foi gerada digitalmente pelo FactureJá</p>
           <p>Emita suas faturas profissionais em minutos - www.factureja.netlify.app</p>
+          {data.companyTaxId && (
+            <p className="mt-1">NIF: {data.companyTaxId} • Tel: {data.companyPhone}</p>
+          )}
         </div>
       </div>
     </div>;

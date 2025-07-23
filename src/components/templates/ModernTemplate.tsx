@@ -156,7 +156,7 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({ data, className = '' })
       </div>
 
       {/* Items Table */}
-      <div className="flex-1 mb-4">
+      <div className="items-area mb-4">
         <div className="overflow-hidden rounded-lg shadow-sm border border-sophisticated-gray-light">
           <table className="w-full">
             <thead>
@@ -178,6 +178,15 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({ data, className = '' })
                   <td className="p-2 text-right font-bold border-b border-sophisticated-gray-light text-sophisticated-navy text-xs">
                     {item.total.toLocaleString('pt-AO')} Kz
                   </td>
+                </tr>
+              ))}
+              {/* Fill empty space if few items */}
+              {data.items.length < 8 && Array.from({ length: 8 - data.items.length }, (_, i) => (
+                <tr key={`empty-${i}`} className="bg-white">
+                  <td className="p-2 border-b border-sophisticated-gray-light text-xs">&nbsp;</td>
+                  <td className="p-2 border-b border-sophisticated-gray-light">&nbsp;</td>
+                  <td className="p-2 border-b border-sophisticated-gray-light">&nbsp;</td>
+                  <td className="p-2 border-b border-sophisticated-gray-light">&nbsp;</td>
                 </tr>
               ))}
             </tbody>
@@ -229,11 +238,14 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({ data, className = '' })
       )}
 
       {/* Footer */}
-      <div className="border-t border-sophisticated-gray-light pt-3 mt-auto">
+      <div className="invoice-footer border-t border-sophisticated-gray-light pt-3">
         <div className="flex justify-between items-center">
           <div className="text-xs text-sophisticated-gray-medium">
             <p className="font-medium">Gerado digitalmente pelo FactureJá</p>
-            <p className="mt-1">www.factureja.ao</p>
+            <p className="mt-1">www.factureja.ao • {data.companyName}</p>
+            {data.companyTaxId && (
+              <p className="mt-1">NIF: {data.companyTaxId}</p>
+            )}
           </div>
           
           {/* QR Code Placeholder */}

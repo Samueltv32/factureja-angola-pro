@@ -104,10 +104,10 @@ const MinimalTemplate: React.FC<MinimalTemplateProps> = ({ data, className = '' 
       </div>
 
       {/* Items */}
-      <div className="flex-1 mb-10">
-        <div className="space-y-3">
+      <div className="items-area mb-10">
+        <div className="space-y-3 min-h-[300px]">
           {data.items.map((item, index) => (
-            <div key={item.id} className="flex justify-between items-start py-2 border-b border-gray-100 last:border-b-0">
+            <div key={item.id} className="flex justify-between items-start py-3 border-b border-gray-100">
               <div className="flex-1 pr-4">
                 <p className="text-sm font-light text-gray-900 mb-1">{item.description}</p>
                 <p className="text-xs text-gray-500 font-light">
@@ -118,6 +118,14 @@ const MinimalTemplate: React.FC<MinimalTemplateProps> = ({ data, className = '' 
                 <p className="text-sm font-light text-gray-900">
                   {item.total.toLocaleString('pt-AO')} Kz
                 </p>
+              </div>
+            </div>
+          ))}
+          {/* Fill empty space if few items */}
+          {data.items.length < 15 && Array.from({ length: 15 - data.items.length }, (_, i) => (
+            <div key={`empty-${i}`} className="py-3 border-b border-gray-100">
+              <div className="text-sm font-light text-transparent">
+                &nbsp;
               </div>
             </div>
           ))}
@@ -163,9 +171,12 @@ const MinimalTemplate: React.FC<MinimalTemplateProps> = ({ data, className = '' 
       )}
 
       {/* Footer */}
-      <div className="mt-auto pt-4">
+      <div className="invoice-footer pt-4">
         <div className="text-center text-xs text-gray-400 font-light">
           <p>Fatura gerada digitalmente</p>
+          {data.companyTaxId && (
+            <p className="mt-1">NIF: {data.companyTaxId} • {data.companyPhone}</p>
+          )}
         </div>
       </div>
     </div>
