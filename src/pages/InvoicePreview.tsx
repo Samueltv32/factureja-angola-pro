@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useInvoice } from '@/contexts/InvoiceContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft, Download, Edit, Printer, Copy, Upload, CheckCircle, Clock, X } from 'lucide-react';
@@ -75,7 +75,7 @@ const InvoicePreview = () => {
         .from('comprovativos_pagamento')
         .select('status')
         .eq('id', id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
 
@@ -298,9 +298,12 @@ const InvoicePreview = () => {
                     Pagar Agora
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-md">
+                <DialogContent className="sm:max-w-md" aria-describedby="payment-dialog-description">
                   <DialogHeader>
                     <DialogTitle>Efetuar Pagamento - 500 Kz</DialogTitle>
+                    <DialogDescription id="payment-dialog-description">
+                      Efetue o pagamento da taxa de serviço para poder baixar sua fatura.
+                    </DialogDescription>
                   </DialogHeader>
                   
                   <div className="space-y-6">
