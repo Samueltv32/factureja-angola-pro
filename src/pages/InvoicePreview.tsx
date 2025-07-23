@@ -511,6 +511,14 @@ const InvoicePreview = () => {
         </div>
       </div>
 
+      {/* Aviso importante */}
+      <div className="mt-8 p-4 bg-muted/50 rounded-lg border border-border/50 no-print">
+        <p className="text-sm text-muted-foreground text-center">
+          ⚠️ <strong>Importante:</strong> Certifique-se de que todas as informações estão corretas antes de efetuar o pagamento. 
+          Não armazenamos dados pessoais ou histórico de transações em nossos servidores.
+        </p>
+      </div>
+
       {/* Print Styles */}
       <style>{`
         @media print {
