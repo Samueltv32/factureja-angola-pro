@@ -159,10 +159,11 @@ All colors MUST be HSL.
 }
 
 .a4-content {
-  height: 100%;
+  min-height: 297mm;
   padding: 15mm 10mm;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
 }
 
 .pagination-controls {

@@ -79,33 +79,29 @@ const MinimalTemplate: React.FC<MinimalTemplateProps> = ({ data, className = '' 
         </div>
       </div>
 
-      {/* Client Information - Always show */}
-      <div className="mb-10">
-        <div className="mb-4">
-          <h3 className="text-xs font-light text-gray-500 uppercase tracking-wide mb-2">
-            Faturar a
-          </h3>
-          <div className="font-light">
-            <h4 className="text-base text-gray-900 mb-2">{data.clientName}</h4>
-            {data.currentPage === 1 ? (
+      {/* Client Information - Only on first page */}
+      {data.currentPage === 1 && (
+        <div className="mb-10">
+          <div className="mb-4">
+            <h3 className="text-xs font-light text-gray-500 uppercase tracking-wide mb-2">
+              Faturar a
+            </h3>
+            <div className="font-light">
+              <h4 className="text-base text-gray-900 mb-2">{data.clientName}</h4>
               <div className="text-xs text-gray-600 space-y-1">
                 <p>{data.clientAddress}</p>
                 {data.clientPhone && <p>{data.clientPhone}</p>}
                 {data.clientEmail && <p>{data.clientEmail}</p>}
                 {data.clientTaxId && <p>NIF: {data.clientTaxId}</p>}
               </div>
-            ) : (
-              <div className="text-xs text-gray-600">
-                {data.clientAddress}
-              </div>
-            )}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Items */}
-      <div className="flex-1 mb-10">
-        <div className="space-y-3">
+      <div className="flex-1 flex flex-col mb-10">
+        <div className="space-y-3 flex-1">
           {data.items.map((item, index) => (
             <div key={item.id} className="flex justify-between items-start py-2 border-b border-gray-100 last:border-b-0">
               <div className="flex-1 pr-4">
@@ -119,6 +115,12 @@ const MinimalTemplate: React.FC<MinimalTemplateProps> = ({ data, className = '' 
                   {item.total.toLocaleString('pt-AO')} Kz
                 </p>
               </div>
+            </div>
+          ))}
+          {/* Add empty rows to fill space when there are few items */}
+          {data.items.length < 22 && Array.from({ length: 22 - data.items.length }).map((_, index) => (
+            <div key={`empty-${index}`} className="py-2 border-b border-gray-100 last:border-b-0">
+              <div className="text-sm">&nbsp;</div>
             </div>
           ))}
         </div>
