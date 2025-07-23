@@ -28,10 +28,18 @@ const InvoicePreview = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [codigoFatura, setCodigoFatura] = useState<string>('');
 
-  // Inicializar código da fatura
+  // Inicializar código da fatura e salvar dados no localStorage
   useEffect(() => {
     if (invoiceData.invoiceNumber) {
       setCodigoFatura(invoiceData.invoiceNumber);
+      
+      // Salvar dados da fatura no localStorage com expiração de 30 dias
+      const faturaData = {
+        ...invoiceData,
+        savedAt: Date.now(),
+        expiresAt: Date.now() + (30 * 24 * 60 * 60 * 1000) // 30 dias
+      };
+      localStorage.setItem(`fatura_${invoiceData.invoiceNumber}`, JSON.stringify(faturaData));
     }
   }, [invoiceData.invoiceNumber]);
 

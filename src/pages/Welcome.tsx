@@ -1,10 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useInvoice } from '@/contexts/InvoiceContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, Zap, Shield, Smartphone } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { FileText, Zap, Shield, Smartphone, Search } from 'lucide-react';
+import { toast } from 'sonner';
+
 const Welcome = () => {
   const navigate = useNavigate();
+  const { updateInvoiceData } = useInvoice();
+  const [codigoConsulta, setCodigoConsulta] = useState('');
   const features = [{
     icon: <Zap className="h-6 w-6 text-angola-red" />,
     title: "Rápido & Simples",
@@ -22,6 +29,63 @@ const Welcome = () => {
     title: "Sem Cadastro",
     description: "Use instantaneamente, sem complicações"
   }];
+  
+  const consultarFatura = () => {
+    if (!codigoConsulta.trim()) {
+      toast.error('Insira o código da fatura');
+      return;
+    }
+    
+    // Limpar faturas expiradas
+    limparFaturasExpiradas();
+    
+    // Buscar fatura no localStorage
+    const faturaData = localStorage.getItem(`fatura_${codigoConsulta.trim()}`);
+    
+    if (!faturaData) {
+      toast.error('Fatura não encontrada. Verifique o código ou a fatura pode ter expirado (30 dias).');
+      return;
+    }
+    
+    try {
+      const dadosFatura = JSON.parse(faturaData);
+      
+      // Verificar se não expirou
+      if (Date.now() > dadosFatura.expiresAt) {
+        localStorage.removeItem(`fatura_${codigoConsulta.trim()}`);
+        toast.error('Fatura expirada. Os dados são mantidos por apenas 30 dias.');
+        return;
+      }
+      
+      // Carregar dados da fatura no contexto
+      updateInvoiceData(dadosFatura);
+      toast.success('Fatura encontrada! Redirecionando...');
+      
+      // Redirecionar para visualização
+      setTimeout(() => navigate('/visualizar'), 500);
+      
+    } catch (error) {
+      toast.error('Erro ao carregar fatura. Dados podem estar corrompidos.');
+    }
+  };
+  
+  const limparFaturasExpiradas = () => {
+    const keys = Object.keys(localStorage);
+    keys.forEach(key => {
+      if (key.startsWith('fatura_')) {
+        try {
+          const data = JSON.parse(localStorage.getItem(key) || '{}');
+          if (data.expiresAt && Date.now() > data.expiresAt) {
+            localStorage.removeItem(key);
+          }
+        } catch (error) {
+          // Remove dados corrompidos
+          localStorage.removeItem(key);
+        }
+      }
+    });
+  };
+
   return <div className="min-h-screen bg-gradient-to-br from-angola-red via-red-600 to-angola-black font-inter">
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-8">
@@ -37,11 +101,47 @@ const Welcome = () => {
             Emita faturas profissionais em minutos, sem complicação.
           </h2>
           
-          <p className="text-lg opacity-90 mb-12 max-w-xl mx-auto">Feito especialmente para empreendedores e pequenos negócios.</p>
+          <p className="text-lg opacity-90 mb-8 max-w-xl mx-auto">Feito especialmente para empreendedores e pequenos negócios.</p>
           
-          <Button onClick={() => navigate('/criar-fatura')} size="lg" className="bg-white text-angola-red hover:bg-gray-100 text-lg px-8 py-6 rounded-xl font-semibold shadow-xl transform hover:scale-105 transition-all duration-200">
-            Criar Minha Primeira Fatura
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
+            <Button onClick={() => navigate('/criar-fatura')} size="lg" className="bg-white text-angola-red hover:bg-gray-100 text-lg px-8 py-6 rounded-xl font-semibold shadow-xl transform hover:scale-105 transition-all duration-200">
+              Criar Nova Fatura
+            </Button>
+          </div>
+          
+          {/* Consultar Fatura Existente */}
+          <div className="max-w-md mx-auto bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+            <h3 className="text-lg font-semibold text-white mb-4 flex items-center justify-center">
+              <Search className="h-5 w-5 mr-2" />
+              Consultar Fatura Existente
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="codigo-consulta" className="text-white/90 text-sm">
+                  Código da Fatura (ex: FJ123456)
+                </Label>
+                <Input
+                  id="codigo-consulta"
+                  type="text"
+                  value={codigoConsulta}
+                  onChange={(e) => setCodigoConsulta(e.target.value)}
+                  placeholder="Insira o código da fatura"
+                  className="mt-1 bg-white/20 border-white/30 text-white placeholder:text-white/60"
+                  onKeyPress={(e) => e.key === 'Enter' && consultarFatura()}
+                />
+              </div>
+              <Button 
+                onClick={consultarFatura}
+                disabled={!codigoConsulta.trim()}
+                className="w-full bg-angola-yellow hover:bg-yellow-500 text-angola-black font-semibold"
+              >
+                Consultar Fatura
+              </Button>
+              <p className="text-xs text-white/70 text-center">
+                Dados mantidos localmente por 30 dias
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
