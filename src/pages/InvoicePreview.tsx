@@ -410,10 +410,10 @@ const InvoicePreview = () => {
 
                     <Button 
                       onClick={submitPaymentProof}
-                      disabled={!selectedPaymentMethod || !paymentProof}
+                      disabled={!selectedPaymentMethod || !paymentProof || isSubmitting}
                       className="w-full bg-angola-red hover:bg-red-700"
                     >
-                      Enviar Comprovativo
+                      {isSubmitting ? 'Enviando...' : 'Enviar Comprovativo'}
                     </Button>
                   </div>
                 </DialogContent>
