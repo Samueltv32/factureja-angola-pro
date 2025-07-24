@@ -34,14 +34,22 @@ const Admin = () => {
 
   // Helper function to get correct Supabase storage URL
   const getStorageUrl = (url: string) => {
-    // Se já é um URL completo válido, retorna como está
+    // Se já é um URL completo válido, verifica se precisa corrigir
     if (url.startsWith('http://') || url.startsWith('https://')) {
       // Se é do formato antigo storage.supabase.com, corrige para o formato correto
       if (url.includes('storage.supabase.com/comprovativos/')) {
         const fileName = url.split('/').pop();
         return `https://irflkgkmmjdofbpomijq.supabase.co/storage/v1/object/public/comprovativos/${fileName}`;
       }
-      // Se já está no formato correto ou é outro URL, retorna como está
+      // Se é do formato antigo sem projeto específico, corrige
+      if (url.includes('supabase.co/storage/v1/object/public/comprovativos/')) {
+        return url.replace(/https:\/\/[^.]+\.supabase\.co/, 'https://irflkgkmmjdofbpomijq.supabase.co');
+      }
+      // Se já está no formato correto do projeto atual, retorna como está
+      if (url.includes('irflkgkmmjdofbpomijq.supabase.co/storage/v1/object/public/comprovativos/')) {
+        return url;
+      }
+      // Para outros URLs externos, retorna como está
       return url;
     }
     // Se é apenas o nome do arquivo, constrói o URL completo
