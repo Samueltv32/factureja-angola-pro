@@ -32,6 +32,22 @@ const Admin = () => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
+  // Helper function to get correct Supabase storage URL
+  const getStorageUrl = (url: string) => {
+    // Se já é um URL completo válido, retorna como está
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      // Se é do formato antigo storage.supabase.com, corrige para o formato correto
+      if (url.includes('storage.supabase.com/comprovativos/')) {
+        const fileName = url.split('/').pop();
+        return `https://irflkgkmmjdofbpomijq.supabase.co/storage/v1/object/public/comprovativos/${fileName}`;
+      }
+      // Se já está no formato correto ou é outro URL, retorna como está
+      return url;
+    }
+    // Se é apenas o nome do arquivo, constrói o URL completo
+    return `https://irflkgkmmjdofbpomijq.supabase.co/storage/v1/object/public/comprovativos/${url}`;
+  };
+
   useEffect(() => {
     const savedAuth = localStorage.getItem("admin_authenticated");
     if (savedAuth === "true") {
@@ -265,42 +281,42 @@ const Admin = () => {
                           </p>
                         </DialogHeader>
                         <div className="mt-4">
-                          {comp.comprovativo_url.toLowerCase().includes('.pdf') ? (
-                            <div className="space-y-2">
-                              <p className="text-sm text-muted-foreground">PDF Comprovativo:</p>
-                              <iframe
-                                src={comp.comprovativo_url}
-                                className="w-full h-96 border rounded"
-                                title="Comprovativo PDF"
-                                onError={() => {
-                                  console.error("Erro ao carregar PDF:", comp.comprovativo_url);
-                                }}
-                              />
-                              <p className="text-xs text-muted-foreground">
-                                Se o PDF não carregar, <a 
-                                  href={comp.comprovativo_url} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  className="text-primary hover:underline"
-                                >
-                                  clique aqui para abrir numa nova aba
-                                </a>
-                              </p>
-                            </div>
-                          ) : (
-                            <div className="space-y-2">
-                              <p className="text-sm text-muted-foreground">Imagem Comprovativo:</p>
-                              <img
-                                src={comp.comprovativo_url}
-                                alt="Comprovativo"
-                                className="w-full max-h-96 object-contain border rounded"
-                                onError={(e) => {
-                                  console.error("Erro ao carregar imagem:", comp.comprovativo_url);
-                                  (e.target as HTMLImageElement).src = "/placeholder.svg";
-                                }}
-                              />
-                            </div>
-                          )}
+                           {comp.comprovativo_url.toLowerCase().includes('.pdf') ? (
+                             <div className="space-y-2">
+                               <p className="text-sm text-muted-foreground">PDF Comprovativo:</p>
+                               <iframe
+                                 src={getStorageUrl(comp.comprovativo_url)}
+                                 className="w-full h-96 border rounded"
+                                 title="Comprovativo PDF"
+                                 onError={() => {
+                                   console.error("Erro ao carregar PDF:", getStorageUrl(comp.comprovativo_url));
+                                 }}
+                               />
+                               <p className="text-xs text-muted-foreground">
+                                 Se o PDF não carregar, <a 
+                                   href={getStorageUrl(comp.comprovativo_url)} 
+                                   target="_blank" 
+                                   rel="noopener noreferrer"
+                                   className="text-primary hover:underline"
+                                 >
+                                   clique aqui para abrir numa nova aba
+                                 </a>
+                               </p>
+                             </div>
+                           ) : (
+                             <div className="space-y-2">
+                               <p className="text-sm text-muted-foreground">Imagem Comprovativo:</p>
+                               <img
+                                 src={getStorageUrl(comp.comprovativo_url)}
+                                 alt="Comprovativo"
+                                 className="w-full max-h-96 object-contain border rounded"
+                                 onError={(e) => {
+                                   console.error("Erro ao carregar imagem:", getStorageUrl(comp.comprovativo_url));
+                                   (e.target as HTMLImageElement).src = "/placeholder.svg";
+                                 }}
+                               />
+                             </div>
+                           )}
                         </div>
                       </DialogContent>
                     </Dialog>
